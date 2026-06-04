@@ -1,0 +1,34 @@
+name: "step-security/dprint-check-action"
+description: "Verify source code formatting using dprint"
+author: "step-security"
+
+inputs:
+  dprint-version:
+    description: "Version of dprint to install (e.g. 0.49.1). Defaults to the latest release."
+    required: false
+    default: ""
+  config-path:
+    description: "Path to a dprint configuration file (e.g. dprint.json). Uses the default config if not specified."
+    required: false
+    default: ""
+  args:
+    description: "Extra arguments forwarded to the dprint check command."
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - name: Set up dprint
+      run: |
+        curl -fsSL https://dprint.dev/install.sh | sh -s ${{ inputs.dprint-version }} > /dev/null 2>&1
+        echo "$HOME/.dprint/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Run dprint check
+      run: |
+        if [ -n "${{ inputs.config-path }}" ]; then
+          $HOME/.dprint/bin/dprint check --config '${{ inputs.config-path }}' ${{ inputs.args }}
+        else
+          $HOME/.dprint/bin/dprint check ${{ inputs.args }}
+        fi
+      shell: bash
