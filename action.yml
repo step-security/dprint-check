@@ -67,7 +67,11 @@ runs:
       env:
         DPRINT_VERSION: ${{ inputs.dprint-version }}
       run: |
-        curl -fsSL https://dprint.dev/install.sh | sh -s "$DPRINT_VERSION" > /dev/null
+        if [ -n "$DPRINT_VERSION" ]; then
+          curl -fsSL https://dprint.dev/install.sh | sh -s "$DPRINT_VERSION" > /dev/null
+        else
+          curl -fsSL https://dprint.dev/install.sh | sh > /dev/null
+        fi
         echo "$HOME/.dprint/bin" >> $GITHUB_PATH
       shell: bash
 
